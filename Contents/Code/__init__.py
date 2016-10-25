@@ -6,7 +6,7 @@ ART = 'art-default.jpg'
 ICON = 'icon-default.png'
 WebsiteURL = 'http://www.dr.dk'
 WebsiteTVURL = 'http://www.dr.dk/tv'
-API_VERSION = "1.1"
+API_VERSION = "1.3"
 
 ####################################################################################################
 def Start():
@@ -30,54 +30,54 @@ def MainMenu():
 		oc.header = unicode(json['ServiceMessage']['Title'])
 		oc.message = json['ServiceMessage']['Message']
 
-	if json['SelectedList']['TotalSize'] >0:
-		for items in json['SelectedList']['Items']:
-			oc.add(PopupDirectoryObject(title = unicode(items['Title']),
-									tagline = items['Subtitle'], 
-									thumb = items['PrimaryImageUri'], 
-									key = Callback(ondemandPlayMenu, 
-												slug = items['Slug'], 
-												seriesslug = items['SeriesSlug'])))
-		oc.add(DirectoryObject(title = unicode(L('SelectedList')), 
-							thumb = R(ICON), 
-							key = Callback(MuList, 
-										sourceURL = json['SelectedList']['Paging']['Source'])))
+#	if json['SelectedList']['TotalSize'] >0:
+#		for items in json['SelectedList']['Items']:
+#			oc.add(PopupDirectoryObject(title = unicode(items['Title']),
+#									tagline = items['Subtitle'], 
+#									thumb = items['PrimaryImageUri'], 
+#									key = Callback(ondemandPlayMenu, 
+#												slug = items['Slug'], 
+#												seriesslug = items['SeriesSlug'])))
+#		oc.add(DirectoryObject(title = unicode(L('SelectedList')), 
+#							thumb = R(ICON), 
+#							key = Callback(MuList, 
+#										sourceURL = json['SelectedList']['Paging']['Source'])))
 	oc.add(DirectoryObject(thumb = R(ICON), 
 						title = unicode(L('Live')), 
 						key = Callback(live)))
-	if 'Themes' in json:
-		for themes in json['Themes']:
-				oc.add(DirectoryObject(thumb = R(ICON), 
-									title = unicode(themes['Title']), 
-									key = Callback(MuList, 
-												sourceURL = themes['Paging']['Source'])))
-	if json['PopularList']['TotalSize']>0:
-		oc.add(DirectoryObject(title = unicode(L('PopularList')), 
-							thumb = R(ICON), 
-							key = Callback(MuList, 
-										sourceURL = json['PopularList']['Paging']['Source'])))
-	if json['PopularList']['TotalSize'] >0:
-		oc.add(DirectoryObject(title = unicode(L('PopularList')), 
-							thumb = R(ICON), 
-							key = Callback(MuList, 
-										sourceURL = json['TopSpots']['Paging']['Source'])))
-	if json['LastChance']['TotalSize'] >0:
-		oc.add(DirectoryObject(title = unicode(L('LastChance')), 
-							thumb = R(ICON), 
-							key = Callback(MuList, 
-										sourceURL = json['LastChance']['Paging']['Source'])))
-	if json['News']['TotalSize'] >0:
-		oc.add(DirectoryObject(title = unicode(L('News')), 
-							thumb = R(ICON), 
-							key = Callback(MuList, 
-										sourceURL = json['News']['Paging']['Source'])))
-	oc.add(DirectoryObject(title = unicode(L('Programmer')), 
-						thumb = R(ICON), 
-						key = Callback(programs)))
-	oc.add(SearchDirectoryObject(identifier="com.plexapp.plugins.drdk", 
-								title=unicode(L("Søg efter programmer")), 
-								prompt=unicode(L("Søg efter...")), 
-								thumb=R(ICON)))
+#	if 'Themes' in json:
+#		for themes in json['Themes']:
+#				oc.add(DirectoryObject(thumb = R(ICON), 
+#									title = unicode(themes['Title']), 
+#									key = Callback(MuList, 
+#												sourceURL = themes['Paging']['Source'])))
+#	if json['PopularList']['TotalSize']>0:
+#		oc.add(DirectoryObject(title = unicode(L('PopularList')), 
+#							thumb = R(ICON), 
+#							key = Callback(MuList, 
+#										sourceURL = json['PopularList']['Paging']['Source'])))
+#	if json['PopularList']['TotalSize'] >0:
+#		oc.add(DirectoryObject(title = unicode(L('PopularList')), 
+#							thumb = R(ICON), 
+#							key = Callback(MuList, 
+#										sourceURL = json['TopSpots']['Paging']['Source'])))
+#	if json['LastChance']['TotalSize'] >0:
+#		oc.add(DirectoryObject(title = unicode(L('LastChance')), 
+#							thumb = R(ICON), 
+#							key = Callback(MuList, 
+#										sourceURL = json['LastChance']['Paging']['Source'])))
+#	if json['News']['TotalSize'] >0:
+#		oc.add(DirectoryObject(title = unicode(L('News')), 
+#							thumb = R(ICON), 
+#							key = Callback(MuList, 
+#										sourceURL = json['News']['Paging']['Source'])))
+#	oc.add(DirectoryObject(title = unicode(L('Programmer')), 
+#						thumb = R(ICON), 
+#						key = Callback(programs)))
+#	oc.add(SearchDirectoryObject(identifier="com.plexapp.plugins.drdk", 
+#								title=unicode(L("Søg efter programmer")), 
+#								prompt=unicode(L("Søg efter...")), 
+#								thumb=R(ICON)))
 	oc.add(PrefsObject(title = unicode( L('Indstillinger')), 
 					thumb = R(ICON)))
 	return oc
@@ -90,9 +90,13 @@ def live():
 	liveChannels = Data.LoadObject('drFront')['Live']
 	channelTitles = Data.LoadObject('channelTitles')
 	for channels in liveChannels:
-		oc.add(PopupDirectoryObject(title = channelTitles[channels['ChannelSlug']]['Title'], 
-								thumb = channelTitles[channels['ChannelSlug']]['PrimaryImageUri'], 
-								key = Callback(livePlayMenu, slug = channels['ChannelSlug'] ) ))
+#		oc.add(PopupDirectoryObject(title = channelTitles[channels['ChannelSlug']]['Title'], 
+#								thumb = channelTitles[channels['ChannelSlug']]['PrimaryImageUri'], 
+#								key = Callback(livePlayMenu, slug = channels['ChannelSlug'] ) ))
+		json = JSON.ObjectFromURL(API_URL + API_VERSION + '/page/tv/live/'  + channels['ChannelSlug'])
+		oc.add(VideoClipObject(title = unicode(channelTitles[json['NowNext']['ChannelSlug']]['Title']), 
+						thumb = channelTitles[json['NowNext']['ChannelSlug']]['PrimaryImageUri'], 
+						url = WebsiteTVURL + '/live/' + json['NowNext']['ChannelSlug']))
 	return oc
 
 ####################################################################################################
@@ -197,7 +201,7 @@ def ondemandPlayMenu(slug, seriesslug):
 def programs():
 	oc = ObjectContainer()
 	if Prefs['ProgramShowStyle'] == 'Alle kanaler (hurtig)':
-		json = JSON.ObjectFromURL( API_URL + API_VERSION +'/page/tv/children/front/*')['Indexes']
+		json = JSON.ObjectFromURL( API_URL + API_VERSION + '/page/tv/front')['Indexes']
 		for channels in json:
 			oc.add(DirectoryObject(title = channels['Title'], 
 								thumb = R(ICON), 
@@ -218,10 +222,10 @@ def programs():
 @route(PREFIX_VIDEO + '/programIndexes')
 def programIndexes(slug):
 	oc = ObjectContainer()
-	json = JSON.ObjectFromURL(API_URL + API_VERSION + '/page/tv/children/front/' + slug )
-	for indexes in json['Indexes']:
-		if indexes['TotalSize'] > 0:
-			oc.add(DirectoryObject(title = indexes['Title'], 
-								key = Callback(MuList, 
-											sourceURL = indexes['Source'])))
+	json = JSON.ObjectFromURL(API_URL + API_VERSION + '/page/tv/live/' + slug )
+	for indexes in json['TopSpots']['Items']:
+#		if indexes['TotalSize'] > 0:
+		oc.add(DirectoryObject(title = indexes['Title'], 
+							key = Callback(MuList, 
+										sourceURL = indexes['PresentationUri'])))
 	return oc
