@@ -6,7 +6,7 @@ ART = 'art-default.jpg'
 ICON = 'icon-default.png'
 WebsiteURL = 'http://www.dr.dk'
 WebsiteTVURL = 'http://www.dr.dk/tv'
-API_VERSION = "1.3"
+API_VERSION = "1.4"
 
 ####################################################################################################
 def Start():
